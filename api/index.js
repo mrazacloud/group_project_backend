@@ -20,14 +20,19 @@ connectDB();
 app.use(cors({ origin: '*', credentials: true }));
 app.use(express.json());
 
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/events', eventRoutes);
+// Root route
+app.get('/', (req, res) => {
+  res.json({ message: 'EventHub API is running', version: '1.0.0' });
+});
 
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Export for Vercel serverless
-module.exports = app;
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/events', eventRoutes);
+
+// Export for Vercel serverless — wrap as handler function
+module.exports = (req, res) => app(req, res);
