@@ -10,6 +10,10 @@ const router = express.Router();
 // GET /api/events — public
 router.get('/', eventController.listEvents);
 
+// GET /api/events/my-rsvps — authenticated, list events user RSVPed to
+// Must be before /:id to avoid matching "my-rsvps" as an event ID
+router.get('/my-rsvps', auth, rsvpController.myRSVPs);
+
 // GET /api/events/:id — public
 router.get('/:id', eventController.getEvent);
 
@@ -41,9 +45,6 @@ router.put('/:id/status', auth, [
 
 // DELETE /api/events/:id — authenticated, delete own event
 router.delete('/:id', auth, eventController.deleteEvent);
-
-// GET /api/events/my-rsvps — authenticated, list events user RSVPed to
-router.get('/my-rsvps', auth, rsvpController.myRSVPs);
 
 // GET /api/events/:id/history — authenticated
 router.get('/:id/history', auth, eventController.getHistory);
