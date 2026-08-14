@@ -65,6 +65,20 @@ exports.cancelRSVP = async (req, res) => {
   }
 };
 
+// GET /api/events/my-rsvps — authenticated, list events user RSVPed to
+exports.myRSVPs = async (req, res) => {
+  try {
+    const rsvps = await RSVP.find({ user: req.user.id, status: { $ne: 'cancelled' } })
+      .populate({
+        path: 'event',
+        populate: { path: 'organizer', select: 'username email' }
+      });
+    res.json(rsvps);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
 // GET /api/events/:id/rsvps — list RSVPs for an event
 exports.listRSVPs = async (req, res) => {
   try {

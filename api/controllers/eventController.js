@@ -140,6 +140,29 @@ exports.updateStatus = async (req, res) => {
   }
 };
 
+// DELETE /api/events/:id — authenticated, delete own event
+exports.deleteEvent = async (req, res) => {
+  try {
+    const event = await Event.findById(req.params.id);
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found.' });
+    }
+
+    if (event.organizer.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'Not authorized to delete this event.' });
+    }
+
+    await EventHistory.deleteMany({ event: event._id });
+    const RSVP = require('../models/RSVP');
+    await RSVP.deleteMany({ event: event._id });
+    await Event.findByIdAndDelete(event._id);
+
+    res.json({ message: 'Event deleted successfully.' });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
 // GET /api/events/:id/history — authenticated, view event history
 exports.getHistory = async (req, res) => {
   try {

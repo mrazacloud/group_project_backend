@@ -39,6 +39,12 @@ router.put('/:id/status', auth, [
   validate
 ], eventController.updateStatus);
 
+// DELETE /api/events/:id — authenticated, delete own event
+router.delete('/:id', auth, eventController.deleteEvent);
+
+// GET /api/events/my-rsvps — authenticated, list events user RSVPed to
+router.get('/my-rsvps', auth, rsvpController.myRSVPs);
+
 // GET /api/events/:id/history — authenticated
 router.get('/:id/history', auth, eventController.getHistory);
 
