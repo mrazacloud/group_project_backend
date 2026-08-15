@@ -36,7 +36,7 @@ exports.createEvent = async (req, res) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { title, description, date, location, capacity } = req.body;
+    const { title, description, date, location, capacity, image } = req.body;
 
     const event = await Event.create({
       title,
@@ -44,6 +44,7 @@ exports.createEvent = async (req, res) => {
       date,
       location,
       capacity,
+      image: image || '',
       organizer: req.user.id
     });
 
@@ -78,7 +79,7 @@ exports.updateEvent = async (req, res) => {
       return res.status(403).json({ message: 'Not authorized to edit this event.' });
     }
 
-    const { title, description, date, location, capacity } = req.body;
+    const { title, description, date, location, capacity, image } = req.body;
     const changes = [];
 
     if (title && title !== event.title) changes.push(`Title changed to "${title}"`);
@@ -86,12 +87,14 @@ exports.updateEvent = async (req, res) => {
     if (date && new Date(date).getTime() !== event.date.getTime()) changes.push(`Date changed to ${date}`);
     if (location && location !== event.location) changes.push(`Location changed to "${location}"`);
     if (capacity && capacity !== event.capacity) changes.push(`Capacity changed to ${capacity}`);
+    if (image !== undefined && image !== event.image) changes.push('Image updated');
 
     event.title = title || event.title;
     event.description = description || event.description;
     event.date = date || event.date;
     event.location = location || event.location;
     event.capacity = capacity || event.capacity;
+    if (image !== undefined) event.image = image;
 
     await event.save();
 
